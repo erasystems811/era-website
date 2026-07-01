@@ -113,11 +113,11 @@
     .acc-hint svg{width:14px;height:14px;stroke:var(--gold-dim);fill:none;stroke-width:1.5;animation:tapPulse 1.8s ease-in-out infinite}
     @keyframes tapPulse{0%,100%{transform:scale(1);opacity:0.7}50%{transform:scale(1.15);opacity:1}}
     .acc-tiles{margin-top:24px;display:flex;gap:14px;align-items:flex-start}
-    .acc-tile{flex:1;padding:26px;cursor:pointer;transition:flex 0.4s ease,background 0.3s,border-color 0.3s;position:relative;border-color:var(--border)!important}
+    .acc-tile{flex:1;min-width:0;padding:26px;cursor:pointer;transition:flex 0.4s ease,background 0.3s,border-color 0.3s;position:relative;border-color:var(--border)!important}
     .acc-tile:hover:not(.open){border-color:var(--border-bright)!important;background:rgba(201,168,76,0.045)}
     .acc-tile-head{display:flex;align-items:center;gap:16px}
     .acc-tile-num{font-family:'DM Mono',monospace;font-size:13px;color:var(--gold-dim)}
-    .acc-tile-title{font-size:19px;font-weight:800;letter-spacing:-0.5px;flex:1}
+    .acc-tile-title{font-size:19px;font-weight:800;letter-spacing:-0.5px;flex:1;min-width:0}
     .acc-tile-plus{width:28px;height:28px;border-radius:50%;border:1px solid var(--border-bright);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:16px;color:var(--gold);transition:transform 0.3s,background 0.3s,border-color 0.3s;flex-shrink:0}
     .acc-tile:hover:not(.open) .acc-tile-plus{border-color:var(--gold);background:rgba(201,168,76,0.12)}
     .acc-tile.open .acc-tile-plus{transform:rotate(45deg);background:var(--gold);color:var(--navy);border-color:var(--gold)}
@@ -190,9 +190,18 @@
 
     /* ── TESTIMONIALS ── */
     #testimonials{background:var(--navy)}
-    .t-track{display:flex;gap:16px;overflow-x:auto;padding-bottom:12px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;margin-top:26px;flex-wrap:nowrap;align-items:stretch}
-    .t-track::-webkit-scrollbar{height:3px}
-    .t-track::-webkit-scrollbar-thumb{background:var(--gold-dim)}
+    .t-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+    .t-arrows{display:flex;gap:10px}
+    .t-arrow{width:44px;height:44px;border-radius:50%;border:1px solid var(--border-bright);background:rgba(17,32,64,0.4);backdrop-filter:blur(10px);color:var(--gold);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0}
+    .t-arrow:hover{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+    .t-arrow:disabled{opacity:0.3;cursor:default}
+    .t-arrow:disabled:hover{background:rgba(17,32,64,0.4);color:var(--gold);border-color:var(--border-bright)}
+    .t-track{display:flex;gap:16px;overflow-x:auto;cursor:grab;padding-bottom:14px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;margin-top:26px;flex-wrap:nowrap;align-items:stretch}
+    .t-track.dragging{cursor:grabbing;user-select:none}
+    .t-track::-webkit-scrollbar{height:5px}
+    .t-track::-webkit-scrollbar-track{background:rgba(201,168,76,0.08);border-radius:999px}
+    .t-track::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:999px}
+    .t-track::-webkit-scrollbar-thumb:hover{background:var(--gold)}
     .t-card{flex:0 0 400px;min-width:400px;scroll-snap-align:start;padding:30px;position:relative;transition:background 0.3s;display:flex;flex-direction:column}
     .t-card::before{content:'\201C';font-family:Georgia,serif;font-size:52px;color:var(--gold);opacity:0.25;position:absolute;top:16px;left:24px;line-height:1}
     .t-quote{font-size:13.5px;line-height:1.75;color:var(--white);padding-top:22px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:none}
@@ -535,7 +544,13 @@
       </div>
       <div class="section-body">
         <div class="section-tag">Client Results</div>
-        <h2>What our<br /><em>clients say.</em></h2>
+        <div class="t-head">
+          <h2>What our<br /><em>clients say.</em></h2>
+          <div class="t-arrows">
+            <button class="t-arrow" id="tPrev" aria-label="Previous testimonial">‹</button>
+            <button class="t-arrow" id="tNext" aria-label="Next testimonial">›</button>
+          </div>
+        </div>
         <div class="t-track">
           <div class="t-card glass">
             <p class="t-quote">The ERA system has been very helpful since we adopted it into our system. Organising appointments and follow-up has never been easier. It also allows us remote follow-up of our clients by aiding us send reminders for medications, when to return for lab results review and general hospital and client communications. I am indeed very happy we adopted the ERA system.</p>
@@ -693,6 +708,51 @@
         btn.textContent=expanded?'Show less ↑':'Read more →';
       });
     });
+
+    // TESTIMONIALS — carousel: wheel, drag, and arrow-button scrolling
+    (function(){
+      const track=document.querySelector('.t-track');
+      const prevBtn=document.getElementById('tPrev'),nextBtn=document.getElementById('tNext');
+      if(!track||!prevBtn||!nextBtn)return;
+
+      track.addEventListener('wheel',e=>{
+        if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){e.preventDefault();track.scrollLeft+=e.deltaY;}
+      },{passive:false});
+
+      let isDown=false,dragged=false,startX=0,scrollStart=0;
+      track.addEventListener('pointerdown',e=>{
+        if(e.pointerType==='touch')return;
+        isDown=true;dragged=false;startX=e.clientX;scrollStart=track.scrollLeft;
+        track.setPointerCapture(e.pointerId);track.classList.add('dragging');
+      });
+      track.addEventListener('pointermove',e=>{
+        if(!isDown)return;
+        const dx=e.clientX-startX;
+        if(Math.abs(dx)>4)dragged=true;
+        track.scrollLeft=scrollStart-dx;
+      });
+      function endDrag(){
+        isDown=false;track.classList.remove('dragging');
+        if(dragged){
+          const suppress=ev=>{ev.stopPropagation();ev.preventDefault();track.removeEventListener('click',suppress,true)};
+          track.addEventListener('click',suppress,true);
+        }
+      }
+      track.addEventListener('pointerup',endDrag);
+      track.addEventListener('pointercancel',endDrag);
+
+      function cardStep(){const c=track.querySelector('.t-card');return c?c.offsetWidth+16:400}
+      prevBtn.addEventListener('click',()=>track.scrollBy({left:-cardStep(),behavior:'smooth'}));
+      nextBtn.addEventListener('click',()=>track.scrollBy({left:cardStep(),behavior:'smooth'}));
+
+      function updateArrows(){
+        prevBtn.disabled=track.scrollLeft<=4;
+        nextBtn.disabled=track.scrollLeft>=track.scrollWidth-track.clientWidth-4;
+      }
+      track.addEventListener('scroll',updateArrows);
+      window.addEventListener('resize',updateArrows);
+      updateArrows();
+    })();
 
     // SCROLL FADE
     const fadeObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');fadeObs.unobserve(e.target)}})},{threshold:0.08});
