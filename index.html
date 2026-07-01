@@ -814,7 +814,23 @@
       updateArrows();
     })();
 
-    // SCROLL FADE
+    // SCROLL MOTION — headings and content blocks fade + slide up into place as each page is reached
+    function addMotion(selector,staggerMs){
+      document.querySelectorAll(selector).forEach((el,i)=>{
+        el.classList.add('fade-in');
+        if(staggerMs)el.style.transitionDelay=(i*staggerMs)+'ms';
+      });
+    }
+    addMotion('.page h2');
+    addMotion('.acc-tiles');
+    addMotion('.serve-card',100);
+    addMotion('.product-card');
+    addMotion('.subproduct-card');
+    addMotion('.t-card',100);
+    addMotion('.story-body, .story-quote',120);
+    addMotion('.contact-info, .contact-form',120);
+    addMotion('.log-widget, .log-pills',120);
+
     const fadeObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');fadeObs.unobserve(e.target)}})},{threshold:0.08});
     document.querySelectorAll('.fade-in').forEach(el=>fadeObs.observe(el));
 
