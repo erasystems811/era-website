@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-411XJCMTMW"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-411XJCMTMW');
+  </script>
+  <title>ERA Systems — Operational Systems for Service Businesses</title>
+  <meta name="description" content="ERA Systems builds operational systems for service businesses — so your business runs smoothly, consistently, and at scale without depending on you for everything." />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#0B1628;--navy-mid:#112040;
+      --gold:#C9A84C;--gold-light:#E8C96A;--gold-dim:#8A6E2F;
+      --white:#F5F2EC;--white-dim:#B8B0A0;
+      --border:rgba(201,168,76,0.15);--border-bright:rgba(201,168,76,0.35);
+      --green:#22c55e;
+      --glass-bg:rgba(17,32,64,0.38);
+      --glass-bg-light:rgba(201,168,76,0.06);
+      --glass-blur:blur(20px) saturate(160%);
+      --glass-border:1px solid rgba(201,168,76,0.18);
+    }
+    html{scroll-behavior:smooth;scroll-snap-type:y mandatory}
+    body{background:var(--navy);color:var(--white);font-family:'Syne',sans-serif;overflow-x:hidden}
+
+    .glass{background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:var(--glass-border);box-shadow:0 8px 40px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.05);border-radius:14px}
+
+    /* ── PAGE GLOW BLOBS (every full-page section except hero, which has its own particles) ── */
+    .page{position:relative;overflow:hidden;scroll-snap-align:start;min-height:100svh;display:flex;flex-direction:column;justify-content:center}
+    .page::before,.page::after{content:'';position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none;z-index:0}
+    .page::before{width:560px;height:560px;background:radial-gradient(circle,rgba(201,168,76,0.16),transparent 70%);top:-180px;right:-160px}
+    .page::after{width:480px;height:480px;background:radial-gradient(circle,rgba(80,120,200,0.10),transparent 70%);bottom:-160px;left:-120px}
+
+    /* ── PAGE RAIL ── */
+    #pageRail{position:fixed;right:26px;top:50%;transform:translateY(-50%);z-index:150;display:flex;flex-direction:column;align-items:center;gap:14px}
+    #pageRail .rail-line{width:1px;height:28px;background:var(--border-bright)}
+    .rail-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;color:var(--gold-dim);background:rgba(17,32,64,0.4);border:1px solid var(--border);backdrop-filter:blur(10px);transition:all 0.3s ease}
+    .rail-dot:hover{color:var(--gold-light);border-color:var(--border-bright)}
+    .rail-dot.active{width:40px;height:40px;color:var(--navy);background:var(--gold);border-color:var(--gold);font-weight:700;box-shadow:0 0 20px rgba(201,168,76,0.5)}
+
+    /* ── NAV ── */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 60px;display:flex;justify-content:space-between;align-items:center;background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:var(--glass-border);border-radius:0;transition:background 0.3s}
+    .nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+    .nav-logo img{height:32px;width:auto}
+    .nav-logo-text{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--gold);text-transform:uppercase}
+    .nav-links{display:flex;gap:36px;list-style:none;align-items:center}
+    .nav-links a{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--white-dim);text-decoration:none;transition:color 0.2s}
+    .nav-links a:hover{color:var(--gold)}
+    .nav-cta{background:var(--gold)!important;color:var(--navy)!important;padding:10px 22px!important;font-weight:700!important;letter-spacing:1.5px!important;border-radius:999px}
+    .nav-cta:hover{background:var(--gold-light)!important;color:var(--navy)!important}
+
+    /* ── HERO ── */
+    #hero{padding:110px 60px 32px;background:var(--navy)}
+    #particleCanvas{position:absolute;inset:0;z-index:0}
+    .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(201,168,76,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.03) 1px,transparent 1px);background-size:60px 60px;z-index:0}
+    .hero-content{position:relative;z-index:2;max-width:860px;margin:auto 0 0}
+    .hero-eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:28px;opacity:0;animation:fadeUp 0.6s 0.1s ease forwards}
+    h1{font-size:clamp(38px,6vw,80px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:28px;opacity:0;animation:fadeUp 0.7s 0.2s ease forwards}
+    h1 em{font-style:normal;color:var(--gold)}
+    .hero-sub{font-size:17px;color:var(--white-dim);max-width:520px;line-height:1.8;margin-bottom:40px;opacity:0;animation:fadeUp 0.7s 0.35s ease forwards}
+    .hero-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap;opacity:0;animation:fadeUp 0.7s 0.5s ease forwards}
+    .btn-primary{background:var(--gold);color:var(--navy);padding:15px 30px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;transition:all 0.2s;display:inline-block;border:none;cursor:pointer;border-radius:999px}
+    .btn-primary:hover{background:var(--gold-light);transform:translateY(-2px)}
+    .btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold);padding:15px 30px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;transition:all 0.2s;display:inline-block;border-radius:999px}
+    .btn-outline:hover{background:rgba(201,168,76,0.1)}
+    .btn-ghost{background:transparent;color:var(--gold-dim);border:1px solid var(--border);padding:8px 16px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;transition:all 0.2s;display:inline-block;border-radius:999px;cursor:pointer}
+    .btn-ghost:hover{color:var(--gold);border-color:var(--border-bright)}
+
+    .hero-bottom{position:relative;z-index:2;margin-top:36px;display:flex;flex-direction:column;gap:14px}
+    /* ── STATS ── */
+    #stats{padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;overflow:hidden}
+    .stat-item{text-align:center;padding:22px 12px;transition:background 0.3s;position:relative}
+    .stat-item:not(:last-child){border-right:1px solid var(--border)}
+    .stat-item:hover{background:rgba(201,168,76,0.06)}
+    .stat-num{font-size:clamp(24px,3vw,38px);font-weight:800;color:var(--gold);letter-spacing:-2px;line-height:1;margin-bottom:8px;display:block}
+    .stat-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--white-dim);text-transform:uppercase}
+
+    /* ── MARQUEE ── */
+    .marquee-wrap{overflow:hidden;padding:12px 0}
+    .marquee-track{display:flex;gap:40px;white-space:nowrap;animation:marquee 18s linear infinite;width:max-content}
+    .marquee-track span{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:var(--gold)}
+    .marquee-dot{color:var(--gold-dim)!important;opacity:0.5}
+    @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    .hero-scroll{position:relative;z-index:2;margin-top:14px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;display:flex;align-items:center;gap:12px}
+    .hero-scroll::after{content:'';display:block;width:48px;height:1px;background:var(--gold-dim)}
+
+    /* ── SHARED SECTION LAYOUT ── */
+    .section-wrap{display:grid;grid-template-columns:80px 1fr;gap:0;min-height:0;position:relative;z-index:1;width:100%}
+    .section-rail{border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding-top:56px;position:relative}
+    .section-rail-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--gold-dim);text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;margin-top:12px}
+    .section-rail-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:1px}
+    .section-body{padding:48px 90px 48px 60px}
+
+    .section-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+    .section-tag::before{content:'';display:block;width:24px;height:1px;background:var(--gold)}
+    h2{font-size:clamp(24px,3.2vw,42px);font-weight:700;letter-spacing:-1px;line-height:1.1;margin-bottom:10px}
+    h2 em{font-style:normal;color:var(--gold)}
+
+    .icon{width:26px;height:26px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+    /* ── WHAT WE DO — accordion tiles ── */
+    #what{background:var(--navy)}
+    .acc-tiles{margin-top:32px;display:flex;gap:14px;align-items:flex-start}
+    .acc-tile{flex:1;padding:26px;cursor:pointer;transition:flex 0.4s ease,background 0.3s;position:relative}
+    .acc-tile-head{display:flex;align-items:center;gap:16px}
+    .acc-tile-num{font-family:'DM Mono',monospace;font-size:13px;color:var(--gold-dim)}
+    .acc-tile-title{font-size:19px;font-weight:800;letter-spacing:-0.5px;flex:1}
+    .acc-tile-plus{font-family:'DM Mono',monospace;font-size:16px;color:var(--gold);transition:transform 0.3s}
+    .acc-tile.open .acc-tile-plus{transform:rotate(45deg)}
+    .acc-tile-body{max-height:0;overflow:hidden;transition:max-height 0.45s ease,opacity 0.3s ease,margin-top 0.4s ease;opacity:0}
+    .acc-tile.open .acc-tile-body{max-height:420px;opacity:1;margin-top:20px}
+    .acc-tile.open{flex:2.2;background:rgba(201,168,76,0.05)}
+    .acc-tile-desc{font-size:13.5px;color:var(--white-dim);line-height:1.7;margin-bottom:18px}
+    .era-bullets{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+    .era-bullets li{font-size:12.5px;color:var(--white-dim);display:flex;align-items:center;gap:10px;font-family:'DM Mono',monospace;letter-spacing:0.3px;padding:9px 14px;background:rgba(11,22,40,0.4);border-radius:8px}
+    .era-bullets li::before{content:'→';color:var(--gold);flex-shrink:0}
+
+    .era-outcomes{margin-top:28px;padding:28px 36px;display:grid;grid-template-columns:1fr 2fr;gap:48px;align-items:center}
+    .era-outcomes-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--gold);text-transform:uppercase}
+    .era-outcomes-label h3{font-size:20px;font-weight:700;color:var(--white);margin-top:10px;letter-spacing:-0.5px;line-height:1.3}
+    .era-outcomes-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .era-outcomes-list li{font-size:13px;color:var(--white-dim);display:flex;align-items:center;gap:9px;padding:6px 0}
+    .era-outcomes-list li::before{content:'✦';color:var(--gold);font-size:9px;flex-shrink:0}
+
+    /* ── WHO WE SERVE ── */
+    #serve{background:var(--navy)}
+    .serve-intro{font-size:14px;color:var(--white-dim);line-height:1.7;max-width:520px;margin-bottom:28px}
+    .serve-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .serve-card{padding:32px;transition:all 0.3s;position:relative;overflow:hidden}
+    .serve-card:hover{background:rgba(201,168,76,0.06);transform:translateY(-3px)}
+    .serve-title{font-size:19px;font-weight:700;margin:14px 0 8px}
+    .serve-desc{font-size:13px;color:var(--white-dim);line-height:1.6;margin-bottom:20px}
+
+    /* ── ERA PATIENT ── */
+    #era-patient{background:var(--navy)}
+    .product-card{padding:32px;position:relative;overflow:hidden;margin-top:24px}
+    .product-card::before{content:'';position:absolute;top:0;left:20px;right:20px;height:2px;background:linear-gradient(90deg,transparent,var(--gold-light),transparent)}
+    .product-inner{display:grid;grid-template-columns:1fr 1.1fr;gap:48px;align-items:start}
+    .product-badge{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--navy);background:var(--gold);padding:5px 12px;display:inline-block;margin-bottom:18px;text-transform:uppercase;border-radius:999px}
+    .product-name{font-size:32px;font-weight:800;letter-spacing:-1px;margin-bottom:12px}
+    .product-desc{font-size:14px;color:var(--white-dim);line-height:1.75;margin-bottom:24px}
+    .feat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .feat-tile{padding:16px 14px;text-align:left;border-radius:10px;background:rgba(11,22,40,0.4);border:1px solid var(--border);transition:all 0.2s}
+    .feat-tile:hover{border-color:var(--border-bright);background:rgba(201,168,76,0.06)}
+    .feat-tile .icon{width:18px;height:18px;margin-bottom:10px}
+    .feat-tile-label{font-size:11.5px;font-weight:700;color:var(--white);letter-spacing:-0.2px;line-height:1.3}
+    .subproduct-card{margin-top:16px;border-left:3px solid var(--gold);padding:26px 32px;display:grid;grid-template-columns:1.4fr 1fr;gap:40px;align-items:center;transition:all 0.3s}
+    .sub-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px}
+    .sub-name{font-size:18px;font-weight:700;margin-bottom:8px}
+    .sub-desc{font-size:13px;color:var(--white-dim);line-height:1.65}
+    .sub-feats{display:flex;flex-direction:column;gap:8px}
+    .sub-feat{font-size:11.5px;color:var(--white-dim);display:flex;align-items:center;gap:9px;font-family:'DM Mono',monospace}
+    .sub-feat::before{content:'→';color:var(--gold)}
+
+    /* ── LIVE LOG PAGE ── */
+    #era-log{background:var(--navy)}
+    .log-layout{display:grid;grid-template-columns:0.9fr 1.1fr;gap:36px;align-items:stretch;margin-top:30px}
+    .log-pills{display:flex;flex-direction:column;gap:9px;justify-content:center}
+    .log-pill{display:flex;align-items:center;gap:12px;padding:13px 16px;font-size:12.5px;color:var(--white-dim);transition:all 0.2s}
+    .log-pill:hover{background:rgba(201,168,76,0.05);color:var(--white);padding-left:20px}
+    .log-pill-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse-green 2s ease-in-out infinite}
+    .log-widget{overflow:hidden}
+    .log-widget-header{padding:16px 22px;border-bottom:1px solid rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:space-between}
+    .log-widget-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--white-dim);text-transform:uppercase}
+    .log-widget-live{display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:10px;color:var(--green)}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse-green 1.5s ease-in-out infinite;flex-shrink:0;display:inline-block}
+    @keyframes pulse-green{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.5)}}
+    .log-entries{padding:8px 0;min-height:300px}
+    .log-entry{padding:12px 22px;border-bottom:1px solid rgba(201,168,76,0.06);opacity:0;animation:logFade 0.4s ease forwards}
+    @keyframes logFade{to{opacity:1}}
+    .log-entry-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+    .log-entry-type{font-size:12px;font-weight:600;color:var(--white)}
+    .log-entry-badge{font-family:'DM Mono',monospace;font-size:9px;padding:3px 8px;background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3);text-transform:uppercase;border-radius:999px}
+    .log-entry-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--white-dim)}
+    .log-entry-time{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold-dim);margin-top:2px}
+
+    /* ── TESTIMONIALS ── */
+    #testimonials{background:var(--navy)}
+    .t-track{display:flex;gap:16px;overflow-x:auto;padding-bottom:12px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;margin-top:26px;flex-wrap:nowrap;align-items:stretch}
+    .t-track::-webkit-scrollbar{height:3px}
+    .t-track::-webkit-scrollbar-thumb{background:var(--gold-dim)}
+    .t-card{flex:0 0 400px;min-width:400px;scroll-snap-align:start;padding:30px;position:relative;transition:background 0.3s;display:flex;flex-direction:column}
+    .t-card::before{content:'\201C';font-family:Georgia,serif;font-size:52px;color:var(--gold);opacity:0.25;position:absolute;top:16px;left:24px;line-height:1}
+    .t-quote{font-size:13.5px;line-height:1.75;color:var(--white);padding-top:22px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:none}
+    .t-quote.expanded{-webkit-line-clamp:unset;overflow:visible}
+    .t-more{margin-top:12px;align-self:flex-start;background:none;border:none;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);cursor:pointer;padding:0}
+    .t-more:hover{color:var(--gold-light)}
+    .t-author{margin-top:20px;display:flex;align-items:center;gap:12px}
+    .t-line{width:1px;height:32px;background:var(--gold);flex-shrink:0}
+    .t-name{font-weight:700;font-size:12.5px;color:var(--gold)}
+    .t-org{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--white-dim);letter-spacing:1px;margin-top:3px;text-transform:uppercase}
+
+    /* ── STORY ── */
+    #story{background:var(--navy)}
+    .story-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;margin-top:28px}
+    .story-body{font-size:16px;color:var(--white-dim);line-height:1.85}
+    .story-quote{padding:32px;position:relative}
+    .story-quote::before{content:'"';position:absolute;top:-14px;left:32px;font-size:64px;color:var(--gold);font-family:Georgia,serif;line-height:1}
+    .story-quote-text{font-size:16px;line-height:1.65;margin-bottom:20px;font-style:italic;color:var(--white)}
+    .story-name{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase}
+    .story-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin-top:4px}
+
+    /* ── CONTACT ── */
+    #contact{background:var(--navy)}
+    .contact-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:44px;margin-top:28px;align-items:stretch}
+    .contact-info{padding:32px}
+    .contact-info h3{font-size:20px;font-weight:600;margin-bottom:12px}
+    .contact-info p{font-size:13.5px;color:var(--white-dim);line-height:1.75;margin-bottom:24px}
+    .contact-detail{display:flex;align-items:center;gap:12px;font-family:'DM Mono',monospace;font-size:11.5px;color:var(--gold);margin-bottom:9px;padding:9px 0;border-bottom:1px solid var(--border)}
+    .contact-detail span{color:var(--white-dim);font-family:'Syne',sans-serif;font-size:13.5px}
+    .contact-form{padding:32px;display:flex;flex-direction:column;gap:14px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .form-group{display:flex;flex-direction:column;gap:6px}
+    .form-group label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase}
+    .form-group input,.form-group textarea{background:rgba(11,22,40,0.55);border:1px solid var(--border-bright);color:var(--white);font-family:'Syne',sans-serif;font-size:14px;padding:12px 15px;outline:none;transition:border-color 0.2s;width:100%;resize:none;border-radius:8px}
+    .form-group input:focus,.form-group textarea:focus{border-color:var(--gold)}
+    .form-group input::placeholder,.form-group textarea::placeholder{color:rgba(181,173,163,0.4)}
+    .form-submit{background:var(--gold);color:var(--navy);border:none;padding:15px 34px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;align-self:flex-start;border-radius:999px}
+    .form-submit:hover{background:var(--gold-light);transform:translateY(-2px)}
+    .form-success{display:none;padding:18px;font-family:'DM Mono',monospace;font-size:12px;color:var(--gold);border-radius:10px}
+
+    /* ── FOOTER ── */
+    footer{scroll-snap-align:end;border-top:1px solid var(--border);padding:30px 60px;display:flex;justify-content:space-between;align-items:center;background:var(--navy)}
+    .footer-logo{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:10px}
+    .footer-links{display:flex;gap:28px}
+    .footer-links a{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--gold-dim);text-decoration:none;text-transform:uppercase;transition:color 0.2s}
+    .footer-links a:hover{color:var(--gold)}
+    .footer-copy{font-family:'DM Mono',monospace;font-size:10px;color:var(--gold-dim)}
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{opacity:0;transform:translateY(16px);transition:opacity 0.8s ease,transform 0.8s ease}
+    .fade-in.visible{opacity:1;transform:translateY(0)}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:768px){
+      html{scroll-snap-type:none}
+      #pageRail{display:none}
+      nav{padding:16px 20px}
+      .nav-links{display:none}
+      #hero{padding:100px 20px 24px}
+      h1{font-size:clamp(32px,9vw,48px);letter-spacing:-1px}
+      h2{font-size:clamp(22px,7vw,34px)}
+      #stats{grid-template-columns:1fr 1fr}
+      .stat-item:nth-child(2n){border-right:none}
+      .section-wrap{grid-template-columns:1fr}
+      .section-rail{display:none}
+      .section-body{padding:44px 18px}
+      .acc-tiles{flex-direction:column}
+      .acc-tile.open{flex:1}
+      .era-outcomes{grid-template-columns:1fr;gap:24px;padding:24px 18px}
+      .era-outcomes-list{grid-template-columns:1fr}
+      .serve-grid{grid-template-columns:1fr}
+      .feat-grid{grid-template-columns:1fr 1fr}
+      .product-inner,.story-grid,.contact-grid,.log-layout,.subproduct-card{grid-template-columns:1fr;gap:26px}
+      .product-card{padding:20px}
+      .t-card{flex:0 0 290px;min-width:290px;padding:24px}
+      footer{flex-direction:column;gap:18px;text-align:center;padding:26px 20px}
+      .footer-links{flex-wrap:wrap;justify-content:center;gap:14px}
+      .hero-scroll{display:none}
+      .page{min-height:auto;padding-top:8px;padding-bottom:8px}
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="mainNav">
+    <a href="#" class="nav-logo">
+      <img src="logo.png" alt="ERA Systems" />
+      <span class="nav-logo-text">ERA Systems</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#what">What We Do</a></li>
+      <li><a href="#era-patient">ERA Patient</a></li>
+      <li><a href="#testimonials">Results</a></li>
+      <li><a href="#story">Our Story</a></li>
+      <li><a href="https://demo.erasystems.com.ng" target="_blank" class="nav-cta">Try Live Demo</a></li>
+    </ul>
+  </nav>
+
+  <div id="pageRail"></div>
+
+  <!-- 00 HERO -->
+  <section id="hero" class="page">
+    <canvas id="particleCanvas"></canvas>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <h1>Operational systems<br /><em>that run your business.</em></h1>
+      <p class="hero-sub">Your business runs on systems. We build them.</p>
+      <div class="hero-actions">
+        <a href="https://demo.erasystems.com.ng" target="_blank" class="btn-primary">Try Live Demo →</a>
+        <a href="#contact" class="btn-outline">Book a Process Audit</a>
+      </div>
+    </div>
+    <div class="hero-bottom">
+      <div id="stats" class="glass fade-in">
+        <div class="stat-item"><span class="stat-num" data-target="9689" data-suffix="+">0</span><div class="stat-label">Automations fired</div></div>
+        <div class="stat-item"><span class="stat-num" data-target="3" data-suffix="">0</span><div class="stat-label">Active clients</div></div>
+        <div class="stat-item"><span class="stat-num" data-target="5" data-suffix="/5">0</span><div class="stat-label">Client feedback rating</div></div>
+        <div class="stat-item"><span class="stat-num" data-target="100" data-suffix="%">0</span><div class="stat-label">System uptime</div></div>
+      </div>
+      <div class="marquee-wrap glass">
+        <div class="marquee-track">
+          <span>Evaluate</span><span class="marquee-dot">✦</span>
+          <span>Rebuild</span><span class="marquee-dot">✦</span>
+          <span>Automate</span><span class="marquee-dot">✦</span>
+          <span>Evaluate</span><span class="marquee-dot">✦</span>
+          <span>Rebuild</span><span class="marquee-dot">✦</span>
+          <span>Automate</span><span class="marquee-dot">✦</span>
+          <span>Evaluate</span><span class="marquee-dot">✦</span>
+          <span>Rebuild</span><span class="marquee-dot">✦</span>
+          <span>Automate</span><span class="marquee-dot">✦</span>
+        </div>
+      </div>
+      <div class="hero-scroll">Scroll to explore</div>
+    </div>
+  </section>
+
+  <!-- 01 WHAT WE DO -->
+  <section id="what" class="page">
+    <div class="section-wrap">
+      <div class="section-rail">
+        <span class="section-rail-num">01</span>
+        <span class="section-rail-label">What We Do</span>
+      </div>
+      <div class="section-body">
+        <div class="section-tag">What We Do</div>
+        <h2>How we work.</h2>
+
+        <div class="acc-tiles">
+          <div class="acc-tile glass open" data-step="1">
+            <div class="acc-tile-head">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              <span class="acc-tile-num">01</span>
+              <span class="acc-tile-title">Evaluate</span>
+              <span class="acc-tile-plus">+</span>
+            </div>
+            <div class="acc-tile-body">
+              <p class="acc-tile-desc">We map your business before we touch it. Every process. Every gap. Every bottleneck.</p>
+              <ul class="era-bullets">
+                <li>Process mapping</li>
+                <li>Workflow mapping</li>
+                <li>Customer experience mapping</li>
+              </ul>
+            </div>
+          </div>
+          <div class="acc-tile glass" data-step="2">
+            <div class="acc-tile-head">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>
+              <span class="acc-tile-num">02</span>
+              <span class="acc-tile-title">Rebuild</span>
+              <span class="acc-tile-plus">+</span>
+            </div>
+            <div class="acc-tile-body">
+              <p class="acc-tile-desc">Built for your business. Not anyone else's. Operational systems that actually fit how you work.</p>
+              <ul class="era-bullets">
+                <li>Booking &amp; scheduling systems</li>
+                <li>Financial tracking systems</li>
+                <li>Customer retention systems</li>
+                <li>Inventory management systems</li>
+                <li>Queue management systems</li>
+                <li>Business websites</li>
+                <li>Operations dashboards</li>
+              </ul>
+            </div>
+          </div>
+          <div class="acc-tile glass" data-step="3">
+            <div class="acc-tile-head">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+              <span class="acc-tile-num">03</span>
+              <span class="acc-tile-title">Automate</span>
+              <span class="acc-tile-plus">+</span>
+            </div>
+            <div class="acc-tile-body">
+              <p class="acc-tile-desc">Less manual work. More consistency. The repetitive tasks — automated so nothing slips.</p>
+              <ul class="era-bullets">
+                <li>Customer communications</li>
+                <li>Follow-ups and reminders</li>
+                <li>Reporting and tracking</li>
+                <li>Notifications and updates</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="era-outcomes glass fade-in">
+          <div class="era-outcomes-label">
+            What you get
+            <h3>Visibility. Clarity.<br />Freedom. Structure.<br />Automation.</h3>
+          </div>
+          <ul class="era-outcomes-list">
+            <li>Visibility into your business</li>
+            <li>Clarity on what's working and what isn't</li>
+            <li>Structure that holds without you</li>
+            <li>Automation that handles the repetitive work</li>
+            <li>Freedom to focus on what actually matters</li>
+            <li>All your systems — turned into one, built for you</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 WHO WE SERVE -->
+  <section id="serve" class="page">
+    <div class="section-wrap">
+      <div class="section-rail">
+        <span class="section-rail-num">02</span>
+        <span class="section-rail-label">Who We Serve</span>
+      </div>
+      <div class="section-body">
+        <div class="section-tag">Who We Serve</div>
+        <h2>Built for<br /><em>B2C service businesses.</em></h2>
+        <p class="serve-intro">If your business delivers a service directly to people, we build the systems behind it.</p>
+        <div class="serve-grid">
+          <div class="serve-card glass">
+            <svg class="icon" viewBox="0 0 24 24" width="30" height="30"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2.3 4 6.2 4c2.1 0 3.6 1.1 4.5 2.4C11.6 5.1 13.1 4 15.2 4c3.9 0 5.8 4.1 4.2 7.7-2.5 4.7-10 9.3-10 9.3z"/><path d="M6 12h3l1.5-3 2 5 1.5-3H18"/></svg>
+            <div class="serve-title">Healthcare</div>
+            <p class="serve-desc">Private hospitals and clinics. Patient communication, care plans, reminders, queue management — automated and running 24/7.</p>
+            <a href="https://demo.erasystems.com.ng" target="_blank" class="btn-primary" style="font-size:12px;padding:12px 24px;">Try Live Demo →</a>
+          </div>
+          <div class="serve-card glass">
+            <svg class="icon" viewBox="0 0 24 24" width="30" height="30"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            <div class="serve-title">Modern Service Businesses</div>
+            <p class="serve-desc">Salons, laundries, gyms, pharmacies. If your team is doing something manually that a system should handle — we build it.</p>
+            <a href="#contact" class="btn-primary" style="font-size:12px;padding:12px 24px;">Book a Process Audit →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 ERA PATIENT — PRODUCT -->
+  <section id="era-patient" class="page">
+    <div class="section-wrap">
+      <div class="section-rail">
+        <span class="section-rail-num">03</span>
+        <span class="section-rail-label">ERA Patient</span>
+      </div>
+      <div class="section-body">
+        <div class="section-tag">Our Healthcare Product</div>
+        <h2>ERA Patient —<br /><em>built for hospitals.</em></h2>
+
+        <div class="product-card glass">
+          <div class="product-inner">
+            <div>
+              <div class="product-badge">Live Product</div>
+              <div class="product-name">ERA Patient</div>
+              <p class="product-desc">Everything your hospital staff does manually — care plans, reminders, follow-ups, queue updates, feedback — automated and running continuously.</p>
+              <a href="https://demo.erasystems.com.ng" target="_blank" class="btn-primary">Try Live Demo →</a>
+            </div>
+            <div class="feat-grid">
+              <div class="feat-tile"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><div class="feat-tile-label">Queue Management</div></div>
+              <div class="feat-tile"><svg class="icon" viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg><div class="feat-tile-label">Auto Reminders</div></div>
+              <div class="feat-tile"><svg class="icon" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 10-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 000-7.8z"/></svg><div class="feat-tile-label">Care Plans</div></div>
+              <div class="feat-tile"><svg class="icon" viewBox="0 0 24 24"><path d="M22 11.1V12a10 10 0 11-5.9-9.1"/><path d="M22 4L12 14l-3-3"/></svg><div class="feat-tile-label">Accountability</div></div>
+              <div class="feat-tile"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg><div class="feat-tile-label">Follow-Ups</div></div>
+              <div class="feat-tile"><svg class="icon" viewBox="0 0 24 24"><path d="M20 12v7a1 1 0 01-1 1H5a1 1 0 01-1-1v-7"/><path d="M12 15V4M12 4l4 4M12 4L8 8"/></svg><div class="feat-tile-label">Birthday Messages</div></div>
+              <div class="feat-tile"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><div class="feat-tile-label">Bulk Emails</div></div>
+              <div class="feat-tile"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><div class="feat-tile-label">Feedback</div></div>
+              <div class="feat-tile"><svg class="icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg><div class="feat-tile-label">Ops Dashboard</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subproduct-card glass">
+          <div>
+            <div class="sub-tag">Works with ERA Patient</div>
+            <div class="sub-name">ERA Connect</div>
+            <p class="sub-desc">Pulls patient data from your existing EMR into ERA Patient — silently, automatically, with no staff involvement.</p>
+          </div>
+          <div class="sub-feats">
+            <div class="sub-feat">Connects to your existing EMR</div>
+            <div class="sub-feat">Real-time silent background sync</div>
+            <div class="sub-feat">No manual data entry</div>
+            <div class="sub-feat">Zero staff involvement required</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 LIVE AUTOMATION LOG -->
+  <section id="era-log" class="page">
+    <div class="section-wrap">
+      <div class="section-rail">
+        <span class="section-rail-num">04</span>
+        <span class="section-rail-label">Live Log</span>
+      </div>
+      <div class="section-body">
+        <div class="section-tag">Running Right Now</div>
+        <h2>Every automation.<br /><em>Every day.</em></h2>
+        <div class="log-layout">
+          <div class="log-pills">
+            <div class="log-pill glass"><span class="log-pill-dot"></span>Birthday emails, daily 07:00</div>
+            <div class="log-pill glass"><span class="log-pill-dot"></span>Medication reminders, 3× daily</div>
+            <div class="log-pill glass"><span class="log-pill-dot"></span>Real-time queue notifications</div>
+            <div class="log-pill glass"><span class="log-pill-dot"></span>Care plan emails on creation</div>
+            <div class="log-pill glass"><span class="log-pill-dot"></span>Feedback after every visit</div>
+            <div class="log-pill glass"><span class="log-pill-dot"></span>Return visit reminders</div>
+          </div>
+          <div class="log-widget glass">
+            <div class="log-widget-header">
+              <span class="log-widget-title">Automation Log — Ferepod Hospital</span>
+              <span class="log-widget-live"><span class="live-dot"></span>Live</span>
+            </div>
+            <div class="log-entries" id="logEntries"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 TESTIMONIALS -->
+  <section id="testimonials" class="page">
+    <div class="section-wrap">
+      <div class="section-rail">
+        <span class="section-rail-num">05</span>
+        <span class="section-rail-label">Client Results</span>
+      </div>
+      <div class="section-body">
+        <div class="section-tag">Client Results</div>
+        <h2>What our<br /><em>clients say.</em></h2>
+        <div class="t-track">
+          <div class="t-card glass">
+            <p class="t-quote">The ERA system has been very helpful since we adopted it into our system. Organising appointments and follow-up has never been easier. It also allows us remote follow-up of our clients by aiding us send reminders for medications, when to return for lab results review and general hospital and client communications. I am indeed very happy we adopted the ERA system.</p>
+            <button class="t-more">Read more →</button>
+            <div class="t-author"><div class="t-line"></div><div><div class="t-name">Dr. Arome Achem</div><div class="t-org">Ferepod Medical Centre · Abuja</div></div></div>
+          </div>
+          <div class="t-card glass">
+            <p class="t-quote">My experience with ERA Patient has been good. The system has made it easier to manage patient information, monitor patient care, and schedule appointments. It has also made the process of sending daily medication reminders to our patients easy, helping to improve follow-up care.</p>
+            <button class="t-more">Read more →</button>
+            <div class="t-author"><div class="t-line"></div><div><div class="t-name">Blessing Animashaun</div><div class="t-org">Ferepod Medical Centre · Abuja</div></div></div>
+          </div>
+          <div class="t-card glass">
+            <p class="t-quote">My experience with ERA Patient so far has been positive. It has helped improve patient management and enhanced communication between healthcare providers and patients. The platform has also made it easier to access patient information quickly, improving efficiency and service delivery. Overall, ERA Patient has contributed to better workflow and patient care in our facility.</p>
+            <button class="t-more">Read more →</button>
+            <div class="t-author"><div class="t-line"></div><div><div class="t-name">Omachi Sunday Tijani</div><div class="t-org">Receptionist · Ferepod Medical Centre · Abuja</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 STORY -->
+  <section id="story" class="page">
+    <div class="section-wrap">
+      <div class="section-rail">
+        <span class="section-rail-num">06</span>
+        <span class="section-rail-label">Our Story</span>
+      </div>
+      <div class="section-body">
+        <div class="section-tag">Our Story</div>
+        <h2>Where we<br /><em>came from.</em></h2>
+        <div class="story-grid">
+          <div class="story-body">
+            <p>Businesses don't fail because of bad people — they fail because the work depends on someone remembering to do it. ERA Systems builds the systems that remove that dependency. ERA Patient is live. More is coming.</p>
+          </div>
+          <div class="story-quote glass">
+            <p class="story-quote-text">We analyze operations, find the gaps, rebuild the workflows, and implement systems that make businesses run better.</p>
+            <div class="story-name">Chidera Umeh</div>
+            <div class="story-title">Founder, ERA Systems</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 CONTACT -->
+  <section id="contact" class="page">
+    <div class="section-wrap">
+      <div class="section-rail">
+        <span class="section-rail-num">07</span>
+        <span class="section-rail-label">Get In Touch</span>
+      </div>
+      <div class="section-body">
+        <div class="section-tag">Get In Touch</div>
+        <h2>Ready to fix<br /><em>your operations?</em></h2>
+        <div class="contact-grid">
+          <div class="contact-info glass">
+            <h3>Let's talk.</h3>
+            <p>Hospital or service business — fill in the form and we'll get back to you.</p>
+            <a href="https://demo.erasystems.com.ng" target="_blank" class="btn-primary" style="display:inline-block;margin-bottom:24px;">Try Live Demo First →</a>
+            <div class="contact-detail">EMAIL → <span>chidera@erasystems.com.ng</span></div>
+            <div class="contact-detail">PHONE → <span>09032637607</span></div>
+            <div class="contact-detail">LOCATION → <span>Abuja, Nigeria</span></div>
+          </div>
+          <div>
+            <form class="contact-form glass" action="https://formspree.io/f/xykawnjl" method="POST" id="demoForm">
+              <div class="form-row">
+                <div class="form-group"><label>Full Name</label><input type="text" name="name" placeholder="Your full name" required /></div>
+                <div class="form-group"><label>Business Name</label><input type="text" name="org" placeholder="Your business" required /></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>Email Address</label><input type="email" name="email" placeholder="your@email.com" required /></div>
+                <div class="form-group"><label>Phone Number</label><input type="tel" name="phone" placeholder="+234 000 000 0000" required /></div>
+              </div>
+              <div class="form-group"><label>What process is slowing you down?</label><textarea name="message" rows="4" placeholder="Tell us what your team does manually every day that should run on its own..."></textarea></div>
+              <button type="submit" class="form-submit">Send Request →</button>
+            </form>
+            <div class="form-success glass" id="formSuccess">✓ Request received. We will be in touch shortly.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><img src="logo.png" alt="ERA Systems" style="height:26px;width:auto;" /><span>ERA Systems</span></div>
+    <div class="footer-links">
+      <a href="#what">What We Do</a>
+      <a href="#era-patient">ERA Patient</a>
+      <a href="#testimonials">Results</a>
+      <a href="#story">Our Story</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="footer-copy">© 2026 ERA Systems LTD · RC 9536766</div>
+  </footer>
+
+  <script>
+    // NAV
+    const nav=document.getElementById('mainNav');
+    window.addEventListener('scroll',()=>{nav.style.background=window.scrollY>60?'rgba(11,22,40,0.7)':'var(--glass-bg)'});
+
+    // PARTICLES
+    const canvas=document.getElementById('particleCanvas');
+    const ctx=canvas.getContext('2d');
+    function resize(){canvas.width=window.innerWidth;canvas.height=canvas.parentElement.offsetHeight}
+    resize();window.addEventListener('resize',resize);
+    class P{constructor(){this.r()}r(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.s=Math.random()*1.5+0.5;this.vx=(Math.random()-0.5)*0.3;this.vy=(Math.random()-0.5)*0.3;this.o=Math.random()*0.4+0.1}u(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height)this.r()}d(){ctx.beginPath();ctx.arc(this.x,this.y,this.s,0,Math.PI*2);ctx.fillStyle=`rgba(201,168,76,${this.o})`;ctx.fill()}}
+    const pts=Array.from({length:80},()=>new P());
+    function anim(){ctx.clearRect(0,0,canvas.width,canvas.height);pts.forEach(p=>{p.u();p.d()});for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(201,168,76,${0.08*(1-d/120)})`;ctx.lineWidth=0.5;ctx.stroke()}}requestAnimationFrame(anim)}
+    anim();
+
+    // COUNTERS
+    function counter(el){const t=parseInt(el.dataset.target),s=el.dataset.suffix||'',dur=2000,start=performance.now();function u(now){const p=Math.min((now-start)/dur,1),e=1-Math.pow(1-p,3);el.textContent=Math.floor(e*t).toLocaleString()+s;if(p<1)requestAnimationFrame(u)}requestAnimationFrame(u)}
+    const cObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){counter(e.target);cObs.unobserve(e.target)}})},{threshold:0.3});
+    document.querySelectorAll('[data-target]').forEach(el=>cObs.observe(el));
+
+    // LIVE LOG
+    const logs=[
+      {type:'Birthday Email',meta:'Patient: STELLA AL-HASSAN · email',time:'Today at 07:00'},
+      {type:'In Care Reminder — Morning',meta:'Patient: ITORO ETUKUDO · email',time:'Today at 07:00'},
+      {type:'Medication Reminder',meta:'Patient: IGEGBE KELVIN · email',time:'Today at 07:00'},
+      {type:'Queue Join Confirmation',meta:'Patient: ITORO ETUKUDO · sms',time:'Today at 09:28'},
+      {type:'Queue — Your Turn',meta:'Patient: ITORO ETUKUDO · sms',time:'Today at 09:32'},
+      {type:'Care Plan Notification',meta:'Patient: IORSUWE ROSEMARY · sms',time:'Yesterday at 12:03'},
+      {type:'Care Plan Email',meta:'Patient: IGEGBE KELVIN · email',time:'Yesterday at 14:25'},
+      {type:'Feedback Email',meta:'Patient: ADAMU KHADIJA · email',time:'Yesterday at 12:00'},
+      {type:'In Care Reminder — Night',meta:'Patient: IGEGBE KELVIN · email',time:'Yesterday at 23:00'},
+      {type:'Return Visit Reminder',meta:'Patient: CHIDERA UMEH · email',time:'17 Jun at 15:30'},
+      {type:'Beneficiary Reminder',meta:'Patient: IGEGBE KELVIN · email',time:'17 Jun at 07:00'},
+      {type:'Birthday Email',meta:'Patient: VICTORIA EMERIBE · email',time:'19 Jun at 07:00'},
+    ];
+    const lc=document.getElementById('logEntries');let li=0;
+    function addLog(){if(lc.children.length>=6)lc.removeChild(lc.firstChild);const e=logs[li%logs.length];const el=document.createElement('div');el.className='log-entry';el.innerHTML=`<div class="log-entry-top"><span class="log-entry-type">${e.type}</span><span class="log-entry-badge">sent</span></div><div class="log-entry-meta">${e.meta}</div><div class="log-entry-time">${e.time}</div>`;lc.appendChild(el);li++}
+    for(let i=0;i<5;i++)addLog();
+    new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){setInterval(addLog,2500);}})},{threshold:0.2}).observe(lc);
+
+    // FORM
+    const form=document.getElementById('demoForm'),succ=document.getElementById('formSuccess');
+    form.addEventListener('submit',async e=>{e.preventDefault();const btn=form.querySelector('.form-submit');btn.textContent='Sending...';btn.disabled=true;try{const r=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{Accept:'application/json'}});if(r.ok){form.style.display='none';succ.style.display='block'}else{btn.textContent='Send Request →';btn.disabled=false}}catch{btn.textContent='Send Request →';btn.disabled=false}});
+
+    // ACCORDION — What We Do
+    document.querySelectorAll('.acc-tile').forEach(tile=>{
+      tile.addEventListener('click',()=>{
+        const wasOpen=tile.classList.contains('open');
+        document.querySelectorAll('.acc-tile').forEach(t=>t.classList.remove('open'));
+        if(!wasOpen)tile.classList.add('open');
+      });
+    });
+
+    // TESTIMONIALS — read more
+    document.querySelectorAll('.t-more').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const q=btn.previousElementSibling;
+        const expanded=q.classList.toggle('expanded');
+        btn.textContent=expanded?'Show less ↑':'Read more →';
+      });
+    });
+
+    // SCROLL FADE
+    const fadeObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');fadeObs.unobserve(e.target)}})},{threshold:0.08});
+    document.querySelectorAll('.fade-in').forEach(el=>fadeObs.observe(el));
+
+    // PAGE RAIL — build, track active page, click to jump
+    const pages=[...document.querySelectorAll('.page')];
+    const rail=document.getElementById('pageRail');
+    pages.forEach((sec,i)=>{
+      const dot=document.createElement('div');
+      dot.className='rail-dot'+(i===0?' active':'');
+      dot.textContent=String(i).padStart(2,'0');
+      dot.addEventListener('click',()=>sec.scrollIntoView({behavior:'smooth',block:'start'}));
+      rail.appendChild(dot);
+      if(i<pages.length-1){const line=document.createElement('div');line.className='rail-line';rail.appendChild(line);}
+    });
+    const railDots=[...rail.querySelectorAll('.rail-dot')];
+    const pageObs=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          const idx=pages.indexOf(e.target);
+          railDots.forEach(d=>d.classList.remove('active'));
+          railDots[idx].classList.add('active');
+        }
+      });
+    },{threshold:0.5});
+    pages.forEach(p=>pageObs.observe(p));
+  </script>
+</body>
+</html>
