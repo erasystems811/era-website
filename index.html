@@ -109,13 +109,18 @@
 
     /* ── WHAT WE DO — accordion tiles ── */
     #what{background:var(--navy)}
-    .acc-tiles{margin-top:32px;display:flex;gap:14px;align-items:flex-start}
-    .acc-tile{flex:1;padding:26px;cursor:pointer;transition:flex 0.4s ease,background 0.3s;position:relative}
+    .acc-hint{display:flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--gold-dim);margin-top:8px}
+    .acc-hint svg{width:14px;height:14px;stroke:var(--gold-dim);fill:none;stroke-width:1.5;animation:tapPulse 1.8s ease-in-out infinite}
+    @keyframes tapPulse{0%,100%{transform:scale(1);opacity:0.7}50%{transform:scale(1.15);opacity:1}}
+    .acc-tiles{margin-top:24px;display:flex;gap:14px;align-items:flex-start}
+    .acc-tile{flex:1;padding:26px;cursor:pointer;transition:flex 0.4s ease,background 0.3s,border-color 0.3s;position:relative;border-color:var(--border)!important}
+    .acc-tile:hover:not(.open){border-color:var(--border-bright)!important;background:rgba(201,168,76,0.045)}
     .acc-tile-head{display:flex;align-items:center;gap:16px}
     .acc-tile-num{font-family:'DM Mono',monospace;font-size:13px;color:var(--gold-dim)}
     .acc-tile-title{font-size:19px;font-weight:800;letter-spacing:-0.5px;flex:1}
-    .acc-tile-plus{font-family:'DM Mono',monospace;font-size:16px;color:var(--gold);transition:transform 0.3s}
-    .acc-tile.open .acc-tile-plus{transform:rotate(45deg)}
+    .acc-tile-plus{width:28px;height:28px;border-radius:50%;border:1px solid var(--border-bright);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:16px;color:var(--gold);transition:transform 0.3s,background 0.3s,border-color 0.3s;flex-shrink:0}
+    .acc-tile:hover:not(.open) .acc-tile-plus{border-color:var(--gold);background:rgba(201,168,76,0.12)}
+    .acc-tile.open .acc-tile-plus{transform:rotate(45deg);background:var(--gold);color:var(--navy);border-color:var(--gold)}
     .acc-tile-body{max-height:0;overflow:hidden;transition:max-height 0.45s ease,opacity 0.3s ease,margin-top 0.4s ease;opacity:0}
     .acc-tile.open .acc-tile-body{max-height:420px;opacity:1;margin-top:20px}
     .acc-tile.open{flex:2.2;background:rgba(201,168,76,0.05)}
@@ -335,6 +340,7 @@
       <div class="section-body">
         <div class="section-tag">What We Do</div>
         <h2>How we work.</h2>
+        <div class="acc-hint"><svg viewBox="0 0 24 24"><path d="M9 11.5a3 3 0 116 0v3.5"/><path d="M15 12.5V6a1.5 1.5 0 013 0v9c0 3.3-2.7 6-6 6h-1.5c-2 0-3-.6-4-2l-3-4.5c-.5-.8 0-2 1-2 .6 0 1.1.3 1.5.8L8 15.5"/></svg>Tap a step to see how it works</div>
 
         <div class="acc-tiles">
           <div class="acc-tile glass open" data-step="1">
