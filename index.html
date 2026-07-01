@@ -227,11 +227,16 @@
     #contact{background:var(--navy)}
     .contact-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:44px;margin-top:28px;align-items:stretch}
     .contact-info{padding:32px}
-    .contact-info h3{font-size:20px;font-weight:600;margin-bottom:12px}
-    .contact-info p{font-size:13.5px;color:var(--white-dim);line-height:1.75;margin-bottom:24px}
-    .contact-detail{display:flex;align-items:center;gap:12px;font-family:'DM Mono',monospace;font-size:11.5px;color:var(--gold);margin-bottom:9px;padding:9px 0;border-bottom:1px solid var(--border)}
+    .contact-info h3{font-size:20px;font-weight:600;margin-bottom:20px}
+    .contact-path{padding:20px 0;border-bottom:1px solid var(--border)}
+    .contact-path:first-of-type{padding-top:0}
+    .contact-path-tag{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;display:block;margin-bottom:8px}
+    .contact-path p{font-size:13.5px;color:var(--white-dim);line-height:1.6;margin-bottom:14px}
+    .contact-detail{display:flex;align-items:center;gap:12px;font-family:'DM Mono',monospace;font-size:11.5px;color:var(--gold);margin-top:9px;padding:9px 0;border-bottom:1px solid var(--border)}
     .contact-detail span{color:var(--white-dim);font-family:'Syne',sans-serif;font-size:13.5px}
+    .contact-detail:last-child{border-bottom:none}
     .contact-form{padding:32px;display:flex;flex-direction:column;gap:14px}
+    .contact-form-tag{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:-4px}
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .form-group{display:flex;flex-direction:column;gap:6px}
     .form-group label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase}
@@ -609,14 +614,22 @@
         <div class="contact-grid">
           <div class="contact-info glass">
             <h3>Let's talk.</h3>
-            <p>Hospital or service business — fill in the form and we'll get back to you.</p>
-            <a href="https://demo.erasystems.com.ng" target="_blank" class="btn-primary" style="display:inline-block;margin-bottom:24px;">Try Live Demo First →</a>
+            <div class="contact-path">
+              <span class="contact-path-tag">Hospital or Clinic</span>
+              <p>See it running before you talk to us — no form needed.</p>
+              <a href="https://demo.erasystems.com.ng" target="_blank" class="btn-primary" style="display:inline-block;">Try Live Demo →</a>
+            </div>
+            <div class="contact-path" style="border-bottom:none;padding-bottom:0;">
+              <span class="contact-path-tag">Other Service Business</span>
+              <p>Fill in the form and we'll book your process audit.</p>
+            </div>
             <div class="contact-detail">EMAIL → <span>chidera@erasystems.com.ng</span></div>
             <div class="contact-detail">PHONE → <span>09032637607</span></div>
             <div class="contact-detail">LOCATION → <span>Abuja, Nigeria</span></div>
           </div>
           <div>
             <form class="contact-form glass" action="https://formspree.io/f/xykawnjl" method="POST" id="demoForm">
+              <div class="contact-form-tag">For Service Businesses — Book a Process Audit</div>
               <div class="form-row">
                 <div class="form-group"><label>Full Name</label><input type="text" name="name" placeholder="Your full name" required /></div>
                 <div class="form-group"><label>Business Name</label><input type="text" name="org" placeholder="Your business" required /></div>
@@ -626,7 +639,7 @@
                 <div class="form-group"><label>Phone Number</label><input type="tel" name="phone" placeholder="+234 000 000 0000" required /></div>
               </div>
               <div class="form-group"><label>What process is slowing you down?</label><textarea name="message" rows="4" placeholder="Tell us what your team does manually every day that should run on its own..."></textarea></div>
-              <button type="submit" class="form-submit">Send Request →</button>
+              <button type="submit" class="form-submit">Book Process Audit →</button>
             </form>
             <div class="form-success glass" id="formSuccess">✓ Request received. We will be in touch shortly.</div>
           </div>
